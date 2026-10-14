@@ -1,5 +1,6 @@
 using Arena.Combat;
 using Arena_Unity.Combat;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +20,7 @@ namespace Arena_Unity.Characters
         {
             public CharacterController Controller;
             public InputActionReference MoveAction;
+            public InputActionReference InteractAction;
         }
 
 
@@ -40,10 +42,13 @@ namespace Arena_Unity.Characters
         [SerializeField] private StateContainer _state;
         [SerializeField] private Health _health;
 
+        public Action OnInteract;
+
         public StateContainer State => _state;
 
-        private Vector2 _moveInput;
+        private bool _isInteracting;
 
+        private Vector2 _moveInput;
         private Camera _camera;
 
         #endregion
@@ -71,6 +76,7 @@ namespace Arena_Unity.Characters
             if (Instance == this)
             {
                 _references.MoveAction.action.Enable();
+                _references.InteractAction.action.Enable();
             }
 
         }
@@ -79,6 +85,7 @@ namespace Arena_Unity.Characters
         {
             if (Instance == this)
             {
+                _references.InteractAction.action.Disable();
                 _references.MoveAction.action.Disable();
             }
         }
@@ -100,6 +107,7 @@ namespace Arena_Unity.Characters
 
             GetInputs();
             Move(t);
+            Interact();
         }
         #endregion
 
@@ -123,6 +131,7 @@ namespace Arena_Unity.Characters
         private void GetInputs()
         {
             _moveInput = _references.MoveAction.action.ReadValue<Vector2>();
+            _isInteracting = _references.InteractAction.action.WasPressedThisFrame();
         }
 
         private void Move(float t)
@@ -133,6 +142,12 @@ namespace Arena_Unity.Characters
             _state.IsMoving = velocity.sqrMagnitude > .01f;
 
             _references.Controller.Move(velocity * t);
+        }
+
+        private void Interact()
+        {
+            if (_isInteracting)
+                OnInteract?.Invoke();
         }
 
         private Vector3 ToWorldDirection(Vector2 input)
