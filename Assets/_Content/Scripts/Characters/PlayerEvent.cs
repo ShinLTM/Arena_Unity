@@ -79,6 +79,14 @@ namespace Arena_Unity.Characters
             _onPlayer.Invoke();
         }
 
+        public void Teleport(Transform target)
+        {
+            if(!Player.Instance) return;
+
+            StopListening();
+            Player.Instance.Teleport(target);
+        }
+
     }
 }
 

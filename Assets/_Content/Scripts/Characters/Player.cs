@@ -46,6 +46,9 @@ namespace Arena_Unity.Characters
 
         public StateContainer State => _state;
 
+        public Health Health => _health;
+
+
         private bool _isInteracting;
 
         private Vector2 _moveInput;
@@ -68,7 +71,7 @@ namespace Arena_Unity.Characters
 
             _camera = Camera.main;
 
-            _health.Initialize();
+            //_health.Initialize();
         }
 
         private void OnEnable()
@@ -116,6 +119,33 @@ namespace Arena_Unity.Characters
         {
             _health.TakeDamage(amount);
         }
+
+        /// <summary>
+        /// Teleports the player.
+        /// </summary>
+        /// <param name="pose">x, y, z: position. w: angle around the vertical axis, in degrees.</param>
+        public void Teleport(Vector4 pose)
+        {
+            // An enabled CharacterController would overwrite the new position
+            _references.Controller.enabled = false;
+
+            Vector3 position = new Vector3(pose.x, pose.y, pose.z);
+            Quaternion rotation = Quaternion.Euler(0f, pose.w, 0f);
+            transform.SetPositionAndRotation(position, rotation);
+
+            _references.Controller.enabled = true;
+        }
+
+        /// <summary>
+        /// Teleports the player to the position and heading of a target, such as a spawn point.
+        /// </summary>
+        public void Teleport(Transform target)
+        {
+            Vector3 position = target.position;
+            Vector4 pose = new Vector4(position.x, position.y, position.z, target.eulerAngles.y);
+            Teleport(pose);
+        }
+
         #endregion
 
         #region Private Methods
