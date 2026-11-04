@@ -1,7 +1,6 @@
-using Arena_Unity.Combat;
 using UnityEngine;
 
-namespace Arena_Unity.Combat
+namespace Arena.Combat
 {
     /// <summary>
     /// Moves straight ahead and damages the first IDamageable it touches.
@@ -20,16 +19,15 @@ namespace Arena_Unity.Combat
             [Min(0.1f)] public float Lifetime = 2f;
         }
 
-        #region Fields
+        #region FIELDS
 
         [SerializeField] private Settings _settings;
 
-        private int _damage;
-        private GameObject _owner;
+        private DamageInfo _damage;
 
         #endregion
 
-        #region Unity Lifecycle
+        #region UNITY LIFECYCLES
 
         private void Update()
         {
@@ -39,7 +37,7 @@ namespace Arena_Unity.Combat
         private void OnTriggerEnter(Collider other)
         {
             // Ignore the shooter and the other trigger zones
-            if (other.isTrigger || other.gameObject == _owner)
+            if (other.isTrigger || other.gameObject == _damage.Source)
                 return;
 
             if (other.TryGetComponent(out IDamageable target))
@@ -50,17 +48,15 @@ namespace Arena_Unity.Combat
 
         #endregion
 
-        #region Public Methods
+        #region PUBLIC METHODS
 
         /// <summary>
         /// Starts the projectile. Called right after Instantiate by whoever fires it.
         /// </summary>
-        /// <param name="damage">Damage dealt to the IDamageable it touches.</param>
-        /// <param name="owner">Shooter, ignored by the projectile.</param>
-        public void Launch(int damage, GameObject owner)
+        /// <param name="damage">Damage dealt to the IDamageable it touches. Its source is the shooter, ignored by the projectile.</param>
+        public void Launch(DamageInfo damage)
         {
             _damage = damage;
-            _owner = owner;
             Destroy(gameObject, _settings.Lifetime);
         }
 

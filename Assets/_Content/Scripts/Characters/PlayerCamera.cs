@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Arena_Unity.Characters
+namespace Arena.Characters
 {
     [ExecuteAlways]
     public class PlayerCamera : MonoBehaviour
@@ -32,9 +32,11 @@ namespace Arena_Unity.Characters
         private Vector3 _velocity;
 
         #endregion
-        void Update()
+
+        // LateUpdate: the player has already moved this frame
+        void LateUpdate()
         {
-            if(!GetPlayer())
+            if (!GetPlayer())
                 return;
 
             Vector3 targetPos = GetTargetPosition();
@@ -47,7 +49,6 @@ namespace Arena_Unity.Characters
             {
                 transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref _velocity, _settings.Smooth);
             }
-
         }
 
         private bool GetPlayer()
@@ -59,7 +60,7 @@ namespace Arena_Unity.Characters
             else if (Player.Instance)
                 _references.Player = Player.Instance;
             else
-                _references.Player = FindAnyObjectByType<Player>();
+                _references.Player = FindFirstObjectByType<Player>();
 
             return _references.Player != null;
         }
@@ -72,4 +73,3 @@ namespace Arena_Unity.Characters
         }
     }
 }
-

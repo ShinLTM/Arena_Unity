@@ -4,27 +4,27 @@ using UnityEngine;
 namespace Arena.Combat
 {
     /// <summary>
-    /// Hit points of an entity. Serialized inside the component that owns it (Player, Enemy),
+    /// Health points of an entity. Serialized inside the component that owns it (Player, Destructible),
     /// which calls Initialize in its Awake.
     /// </summary>
     [System.Serializable]
     public class Health
     {
-        #region Fields
+        #region FIELDS
 
-        [Tooltip("Hit points when full.")]
+        [Tooltip("Health points when full.")]
         [Min(1)] public int Max = 100;
 
-        [Tooltip("Current hit points, visible for debugging.")]
+        [Tooltip("Current health points, visible for debugging.")]
         [SerializeField] private int _current;
 
         /// <summary>
-        /// Raised with the current and max hit points each time they change.
+        /// Raised with the current and max health points each time they change.
         /// </summary>
         public event Action<int, int> OnChange;
 
         /// <summary>
-        /// Raised once, when the hit points reach zero.
+        /// Raised once, when the health points reach zero.
         /// </summary>
         public event Action OnDied;
 
@@ -33,10 +33,10 @@ namespace Arena.Combat
 
         #endregion
 
-        #region Public Methods
+        #region PUBLIC METHODS
 
         /// <summary>
-        /// Fills the hit points. Called by the owner in its Awake.
+        /// Fills the health points. Called by the owner in its Awake.
         /// </summary>
         public void Initialize()
         {
@@ -44,21 +44,25 @@ namespace Arena.Combat
         }
 
         /// <summary>
-        /// Removes hit points and raises OnDied the first time they reach zero.
+        /// Removes health points and raises OnDied the first time they reach zero.
+        /// Returns the health points actually removed.
         /// </summary>
-        public void TakeDamage(int amount)
+        public int TakeDamage(DamageInfo damage)
         {
-            if (IsDead || amount <= 0)
-                return;
+            if (IsDead || damage.Amount <= 0)
+                return 0;
 
-            SetCurrent(_current - amount);
+            int previous = _current;
+            SetCurrent(_current - damage.Amount);
 
             if (IsDead)
                 OnDied?.Invoke();
+
+            return previous - _current;
         }
 
         /// <summary>
-        /// Gives hit points back without exceeding Max. Has no effect once dead.
+        /// Gives health points back without exceeding Max. Has no effect once dead.
         /// </summary>
         public void Heal(int amount)
         {
@@ -70,7 +74,7 @@ namespace Arena.Combat
 
         #endregion
 
-        #region Private Methods
+        #region PRIVATE METHODS
 
         private void SetCurrent(int value)
         {

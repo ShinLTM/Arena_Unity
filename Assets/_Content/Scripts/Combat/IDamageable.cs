@@ -1,10 +1,10 @@
-namespace Arena_Unity.Combat
+namespace Arena.Combat
 {
     /// <summary>
-    /// Anything that can receive damage: player, enemy, destructible object.
+    /// Anything that can receive damage: player, destructible object.
     /// </summary>
     public interface IDamageable
     {
-        void TakeDamage(int amount);
+        void TakeDamage(DamageInfo damage);
     }
 }
