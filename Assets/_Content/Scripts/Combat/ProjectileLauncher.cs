@@ -5,7 +5,8 @@ namespace Arena.Combat
 {
     /// <summary>
     /// Fires projectiles from a muzzle, limited by the fire interval and the ammo count.
-    /// Placed on the root of the shooter, which the projectiles ignore.
+    /// Placed on the weapon or on the shooter. The shooter (first IDamageable found in the parents: Player, Destructible)
+    /// and all its children are ignored by the projectiles.
     /// </summary>
     public class ProjectileLauncher : MonoBehaviour
     {
@@ -14,6 +15,9 @@ namespace Arena.Combat
         {
             [Tooltip("Weapon data: damage, fire interval, ammo, projectile.")]
             public WeaponData Weapon;
+
+            [Tooltip("The ammo never decreases. Used by the enemies.")]
+            public bool InfiniteAmmo;
         }
 
         [System.Serializable]
@@ -42,8 +46,12 @@ namespace Arena.Combat
 
         public StateContainer State => _state;
         public int MaxAmmo => _settings.Weapon.MaxAmmo;
+        public Transform Muzzle => _references.Muzzle;
 
         private float _nextFireTime;
+
+        // Given as damage source: the projectiles ignore it and all its children
+        private GameObject _owner;
 
         #endregion
 
@@ -52,6 +60,10 @@ namespace Arena.Combat
         private void Awake()
         {
             _state.Ammo = MaxAmmo;
+
+            // The launcher is usually on the weapon: the shooter is the character that holds it
+            IDamageable owner = GetComponentInParent<IDamageable>();
+            _owner = owner != null ? ((Component)owner).gameObject : gameObject;
         }
 
         #endregion
@@ -68,11 +80,12 @@ namespace Arena.Combat
 
             _nextFireTime = Time.time + _settings.Weapon.FireInterval;
 
-            SetAmmo(_state.Ammo - 1);
+            if (!_settings.InfiniteAmmo)
+                SetAmmo(_state.Ammo - 1);
 
             Transform muzzle = _references.Muzzle;
             Projectile projectile = Instantiate(_settings.Weapon.ProjectilePrefab, muzzle.position, muzzle.rotation);
-            projectile.Launch(new DamageInfo(_settings.Weapon.Damage, _settings.Weapon.DamageType, gameObject));
+            projectile.Launch(new DamageInfo(_settings.Weapon.Damage, _settings.Weapon.DamageType, _owner));
             return true;
         }
 

@@ -1,3 +1,4 @@
+using Arena.Characters;
 using UnityEngine;
 
 namespace Arena.Combat
@@ -36,11 +37,12 @@ namespace Arena.Combat
 
         private void OnTriggerEnter(Collider other)
         {
-            // Ignore the shooter and the other trigger zones
-            if (other.isTrigger || other.gameObject == _damage.Source)
+            // Ignore the shooter (and its children, such as its weapon) and the other trigger zones
+            if (other.isTrigger || (_damage.Source && other.transform.IsChildOf(_damage.Source.transform)))
                 return;
 
-            if (other.TryGetComponent(out IDamageable target))
+            // No friendly fire between enemies: the projectile is only stopped
+            if (other.TryGetComponent(out IDamageable target) && !IsBetweenEnemies(other))
                 target.TakeDamage(_damage);
 
             Destroy(gameObject);
@@ -58,6 +60,17 @@ namespace Arena.Combat
         {
             _damage = damage;
             Destroy(gameObject, _settings.Lifetime);
+        }
+
+        #endregion
+
+        #region PRIVATE METHODS
+
+        private bool IsBetweenEnemies(Collider other)
+        {
+            return _damage.Source
+                && _damage.Source.GetComponent<EnemyBase>() != null
+                && other.GetComponentInParent<EnemyBase>() != null;
         }
 
         #endregion

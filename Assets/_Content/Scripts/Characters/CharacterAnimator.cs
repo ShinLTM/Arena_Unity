@@ -7,7 +7,7 @@ namespace Arena.Characters
     /// Placed on the character root. Only sets parameters: the states, transitions and their durations
     /// are set in the Animator Controller.
     /// Floats Forward and Right: speed in the character space, divided by the walk speed (locomotion blend tree).
-    /// Bools IsGrounded, IsRunning, IsStunned. Triggers Jump, Dash, Die, Win, Lose.
+    /// Bools IsGrounded, IsRunning, IsStunned. Triggers Jump, Dash, Attack, Die, Win, Lose.
     /// </summary>
     public class CharacterAnimator : MonoBehaviour
     {
@@ -54,6 +54,7 @@ namespace Arena.Characters
         private static readonly int IsStunnedParameter = Animator.StringToHash("IsStunned");
         private static readonly int JumpTrigger = Animator.StringToHash("Jump");
         private static readonly int DashTrigger = Animator.StringToHash("Dash");
+        private static readonly int AttackTrigger = Animator.StringToHash("Attack");
         private static readonly int DieTrigger = Animator.StringToHash("Die");
         private static readonly int WinTrigger = Animator.StringToHash("Win");
         private static readonly int LoseTrigger = Animator.StringToHash("Lose");
@@ -122,6 +123,11 @@ namespace Arena.Characters
         public void Dash()
         {
             SetTrigger(DashTrigger);
+        }
+
+        public void Attack()
+        {
+            SetTrigger(AttackTrigger);
         }
 
         /// <summary>
