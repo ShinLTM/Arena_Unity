@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a4852c6f394a441935fae7b9f9ec82, type: 3}
   m_Name: WeaponData_EnemyGun
   m_EditorClassIdentifier: Assembly-CSharp::Arena.Combat.WeaponData
-  _damage: 3
+  _damage: 5
   _damageType: 0
   _fireInterval: 0.5
   _maxAmmo: 30

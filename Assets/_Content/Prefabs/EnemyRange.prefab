@@ -372,7 +372,7 @@ MonoBehaviour:
   _settings:
     ShootRange: 12
     PreferredDistance: 8
-    AimTolerance: 10
+    AimTolerance: 18
     AimDelay: 0.5
     TargetHeight: 1
     EyeHeight: 1.2
